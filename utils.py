@@ -39,9 +39,10 @@ def load_data(path="./data/cora/", dataset="cora"):
     idx_test = range(600, 1500)
 
     adj=torch.FloatTensor(np.array(adj.todense()))
-    edge_attr =[adj,adj.t(),adj+adj.t()]
+    edge_attr = [adj,adj.t(),adj+adj.t()]
     edge_attr=torch.stack(edge_attr,dim=0)
-    edge_attr=DSN(edge_attr)
+
+    # edge_attr=DSN(edge_attr)
     features = torch.FloatTensor(features)
     labels = torch.LongTensor(np.where(labels)[1])
 
@@ -54,17 +55,21 @@ def load_data(path="./data/cora/", dataset="cora"):
 
 
 def DSN2(t):
-    a=t.sum(dim=1,keepdim=True)
-    b=t.sum(dim=0,keepdim=True)
-    lamb=torch.cat([a.squeeze(),b.squeeze()],dim=0).max()
-    r=t.shape[0]*lamb-t.sum(dim=0).sum(dim=0)
-    
-    a=a.expand(-1,t.shape[1])
-    b=b.expand(t.shape[0],-1)
-    tt=t+(lamb**2-lamb*(a+b)+a*b)/r
+    # a=t.sum(dim=1,keepdim=True)
+    # b=t.sum(dim=0,keepdim=True)
+    # lamb=torch.cat([a.squeeze(),b.squeeze()],dim=0).max()
+    # r=t.shape[0]*lamb-t.sum(dim=0).sum(dim=0)
+    #
+    # a=a.expand(-1,t.shape[1])
+    # b=b.expand(t.shape[0],-1)
+    # tt=t+(lamb**2-lamb*(a+b)+a*b)/r
+    #
+    # ttmatrix=tt/tt.sum(dim=0)[0]
+    # ttmatrix=torch.where(t>0,ttmatrix,t)
 
-    ttmatrix=tt/tt.sum(dim=0)[0]
-    ttmatrix=torch.where(t>0,ttmatrix,t)
+    tt = t / (t.sum(1).unsqueeze(1) + 1e-6)
+    tmp = tt / (tt.sum(0) + 1e-6)
+    ttmatrix = tmp @ tt.T
     return ttmatrix
 
 

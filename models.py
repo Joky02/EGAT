@@ -8,10 +8,10 @@ class GAT(nn.Module):
     def __init__(self, nfeat,ef_sz, nhid,nclass, dropout, alpha, nheads):
         """
         Dense version of GAT.
-        nfeat输入节点的特征向量长度，标量
-        ef_sz输入edge特征矩阵的大小，列表，PxNxN
-        nhid隐藏节点的特征向量长度，标量
-        nclass输出节点的特征向量长度，标量
+        nfeat 输入节点的特征向量长度，标量
+        ef_sz 输入edge特征矩阵的大小，列表，PxNxN
+        nhid 隐藏节点的特征向量长度，标量
+        nclass 输出节点的特征向量长度，标量
         dropout：drpout的概率
         alpha：leakyrelu的第三象限斜率
         nheads：attention_head的个数
@@ -19,8 +19,8 @@ class GAT(nn.Module):
         super(GAT, self).__init__()
         self.dropout = dropout
         
-        #起始层
-        self.attentions = [GraphAttentionLayer(nfeat, nhid[0], dropout=dropout, alpha=alpha, concat=True) for _ in range(nheads[0])]
+        # 起始层
+        self.attentions = [GraphAttentionLayer(nfeat, nhid, dropout=dropout, alpha=alpha, concat=True) for _ in range(nheads)]
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
         
@@ -29,8 +29,8 @@ class GAT(nn.Module):
         # for i, attention in enumerate(self.hidden_atts):
         #     self.add_module('hidden_att_{}'.format(i), attention)
         
-        #输出层
-        self.out_att = GraphAttentionLayer(nhid[0]*nheads[0]*ef_sz[0], nclass, dropout=dropout, alpha=alpha, concat=False)
+        # 输出层
+        self.out_att = GraphAttentionLayer(nhid*nheads*ef_sz, nclass, dropout=dropout, alpha=alpha, concat=False)
 
     def forward(self, x, edge_attr):
         
@@ -56,6 +56,3 @@ class GAT(nn.Module):
         x = F.dropout(x, self.dropout, training=self.training)#输出层   
         x = F.elu(self.out_att(x, edge_attr))#输出层
         return F.log_softmax(x, dim=1)
-
-
-

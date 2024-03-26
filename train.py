@@ -19,18 +19,18 @@ from models import GAT
 
 # Training settings
 args={
-    'no_cuda':True,
+    'no_cuda':False,
     #'no_cuda':False,
     'fastmode':False,
     'seed':72,
     'epochs':10000,
-    'lr':0.005,
+    'lr':0.001,
     'weight_decay':5e-4,
-    'hidden':[64,8],
-    'nb_heads':[1,8],
+    'hidden':64,
+    'nb_heads':1,
     'dropout':0.6,
     'alpha':0.2,
-    'patience':50,
+    'patience':100,
     'batch_size':20
 }
 
@@ -74,8 +74,10 @@ labels=tem_labels
 
 #%%Model and optimizer
 
+# DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 model = GAT(nfeat=features.shape[1],
-            ef_sz=tuple(edge_attr.shape),
+            ef_sz=edge_attr.shape[0],
             nhid=args['hidden'], 
             nclass=int(labels.max()) + 1, 
             dropout=args['dropout'], 
