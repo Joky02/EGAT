@@ -34,9 +34,9 @@ def load_data(path="./data/cora/", dataset="cora"):
     # adj = normalize_adj(adj + sp.eye(adj.shape[0]))
     adj = adj + sp.eye(adj.shape[0])
 
-    idx_train = range(300)
-    idx_val = range(300, 600)
-    idx_test = range(600, 1500)
+    idx_train = range(75)
+    idx_val = range(75, 300)
+    idx_test = range(300, 1500)
 
     adj=torch.FloatTensor(np.array(adj.todense()))
     edge_attr = [adj,adj.t(),adj+adj.t()]
